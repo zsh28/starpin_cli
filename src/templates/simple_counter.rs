@@ -48,10 +48,6 @@ anyhow = "1.0"
 [lib]
 crate-type = ["cdylib", "lib"]
 
-[[bin]]
-name = "{}"
-path = "src/main.rs"
-
 [features]
 default = []
 test_helpers = ["star_frame/test_helpers"]
@@ -62,7 +58,7 @@ program-id = "{}"
 
 [dev-dependencies]
 tokio = {{ version = "1.0", features = ["macros", "rt-multi-thread"] }}
-"#, project_name, versions.star_frame, project_name, program_id);
+"#, project_name, versions.star_frame, program_id);
 
         fs::write(project_path.join("Cargo.toml"), cargo_toml)?;
 
@@ -174,16 +170,6 @@ pub struct FindCounterSeeds {{
 "#, program_id);
 
         fs::write(project_path.join("src").join("lib.rs"), lib_rs)?;
-
-        // Create main.rs
-        let main_rs = format!(r#"use {}::*;
-
-fn main() {{
-    println!("Simple Star Frame Counter Program");
-}}
-"#, project_name.replace('-', "_"));
-
-        fs::write(project_path.join("src").join("main.rs"), main_rs)?;
 
         // Create test file
         let test_rs = format!(r#"use {}::*;

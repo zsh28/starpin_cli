@@ -50,10 +50,6 @@ anyhow = "1.0"
 [lib]
 crate-type = ["cdylib", "lib"]
 
-[[bin]]
-name = "{}"
-path = "src/main.rs"
-
 [features]
 default = []
 prod = []
@@ -71,7 +67,7 @@ mollusk-svm = {{ version = "0.8" }}
 solana-account = {{ version = "2.0" }}
 mollusk-svm-programs-token = {{ version = "0.8" }}
 pretty_assertions = {{ version = "1.4" }}
-"#, project_name, versions.star_frame, versions.star_frame, project_name, program_id);
+"#, project_name, versions.star_frame, versions.star_frame, program_id);
 
         fs::write(project_path.join("Cargo.toml"), cargo_toml)?;
 
@@ -642,21 +638,6 @@ impl StarFrameInstruction for CancelOrders {
 }
 "#;
         fs::write(project_path.join("src/instructions/cancel_orders.rs"), cancel_orders_rs)?;
-
-        // Create main.rs
-        let main_rs = format!(r#"use {}::*;
-
-fn main() {{
-    println!("Star Frame Marketplace Program");
-    println!("Features:");
-    println!("  - SPL Token Integration");
-    println!("  - Order Book Management");
-    println!("  - Bid/Ask Matching");
-    println!("  - Market Making");
-}}
-"#, project_name.replace('-', "_"));
-
-        fs::write(project_path.join("src").join("main.rs"), main_rs)?;
 
         // Create test file
         let test_rs = format!(r#"use {}::*;
