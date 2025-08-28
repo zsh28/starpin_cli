@@ -329,11 +329,6 @@ wallet = "~/.config/solana/id.json"
 build = "starframe build"
 test = "starframe test"
 deploy = "starframe deploy"
-
-[[test.genesis]]
-# Add genesis accounts for testing
-address = "11111111111111111111111111111111"
-program = "system_program.so"
 "#, 
             project_name.replace('-', "_"), program_id,
             project_name.replace('-', "_"), program_id,

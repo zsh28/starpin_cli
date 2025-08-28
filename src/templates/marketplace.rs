@@ -916,16 +916,6 @@ wallet = "~/.config/solana/id.json"
 build = "starframe build"
 test = "starframe test --features test_helpers"
 deploy = "starframe deploy"
-
-[[test.genesis]]
-# Add genesis accounts for testing
-address = "11111111111111111111111111111111"
-program = "system_program.so"
-
-[[test.genesis]]
-# SPL Token program
-address = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-program = "spl_token.so"
 "#, 
             project_name.replace('-', "_"), program_id,
             project_name.replace('-', "_"), program_id,
