@@ -166,9 +166,9 @@ starframe sync --from-lib
 - ✅ Multi-network support (localnet/devnet/mainnet)
 - ✅ Testing utilities with network configuration
 - ✅ Network-aware deployment
-- ✅ Anchor-style network management
+- ✅ Professional network management
 - ✅ Configuration files (StarFrame.toml)
-- ✅ Program key management (generate/sync like Anchor)
+- ✅ Program key management (generate/sync)
 - ✅ Automatic program ID synchronization
 
 ## Project Structure

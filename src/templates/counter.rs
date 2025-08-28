@@ -349,7 +349,7 @@ Thumbs.db
 
         fs::write(project_path.join(".gitignore"), gitignore)?;
 
-        // Create StarFrame.toml (equivalent to Anchor.toml)
+        // Create StarFrame.toml configuration file
         let starframe_toml = format!(r#"[toolchain]
 
 [features]

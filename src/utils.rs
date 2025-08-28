@@ -13,7 +13,7 @@ pub fn project_name_validator(name: &str) -> bool {
         && !name.starts_with('_')
 }
 
-/// Generate a random program ID using actual Ed25519 keypair like Anchor
+/// Generate a random program ID using actual Ed25519 keypair
 pub fn generate_program_id() -> String {
     let keypair = Keypair::new();
     keypair.pubkey().to_string()
