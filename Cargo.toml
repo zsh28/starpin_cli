@@ -1,6 +1,6 @@
 [package]
 name = "starpin"
-version = "0.1.1"
+version = "0.1.2"
 readme = "README.md"
 edition = "2021"
 authors = ["Zeesh - contact me on Zeeshdev28@gmail.com"]
