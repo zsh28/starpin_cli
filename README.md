@@ -1,8 +1,24 @@
-# Starpin CLI
+<div align="center">
+  <img src="assets/logo.png" alt="Starpin Logo" width="200" height="200">
+  
+  # Starpin CLI
 
-A command-line interface for creating and managing Star Frame Solana programs.
+  [![Crates.io](https://img.shields.io/crates/v/starpin.svg)](https://crates.io/crates/starpin)
+  [![Downloads](https://img.shields.io/crates/d/starpin.svg)](https://crates.io/crates/starpin)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+  A command-line interface for creating and managing [Star Frame](https://github.com/staratlasmeta/star_frame) Solana programs.
+</div>
 
 ## Installation
+
+### Using Cargo (Recommended)
+
+Install directly from [crates.io](https://crates.io/crates/starpin):
+
+```bash
+cargo install starpin
+```
 
 ### From Source
 
@@ -11,12 +27,6 @@ git clone https://github.com/zsh28/starpin_cli
 cd starpin_cli
 cargo build --release
 # Add target/release/starpin to your PATH
-```
-
-### Using Cargo
-
-```bash
-cargo install starpin
 ```
 
 ## Usage
@@ -158,18 +168,50 @@ Use program ID from lib.rs as source of truth:
 starpin sync --from-lib
 ```
 
-## Features
+## ✨ Features
 
-- ✅ Project template generation
-- ✅ Type-safe Star Frame program templates
-- ✅ Integrated build system with automatic IDL generation
-- ✅ Multi-network support (localnet/devnet/mainnet)
-- ✅ Testing utilities with network configuration
-- ✅ Network-aware deployment
-- ✅ Professional network management
-- ✅ Configuration files (Starpin.toml)
-- ✅ Program key management (generate/sync)
-- ✅ Automatic program ID synchronization
+- 🚀 **Project template generation** - Bootstrap projects with production-ready templates
+- 🔒 **Type-safe Star Frame programs** - Compile-time safety for Solana development
+- ⚡ **Integrated build system** - Automatic IDL generation and optimized builds
+- 🌐 **Multi-network support** - Seamless deployment to localnet/devnet/mainnet
+- 🧪 **Testing utilities** - Network-aware testing with mollusk-svm integration
+- 📦 **Smart dependency management** - Automatic latest version fetching
+- ⚙️ **Configuration management** - Professional Starpin.toml configuration
+- 🔑 **Program key management** - Generate and sync program IDs like Anchor
+- 📋 **IDL generation** - Generate client libraries and type definitions
+- 🔄 **Automatic synchronization** - Keep program IDs in sync across files
+
+## 🤔 Why Starpin?
+
+Starpin is the **official CLI** for [Star Frame](https://github.com/staratlasmeta/star_frame), bringing the power of type-safe Solana development to your fingertips:
+
+- **🎯 Focus on logic, not boilerplate** - Star Frame eliminates repetitive Solana program code
+- **🛡️ Type safety** - Catch errors at compile-time with Rust's type system
+- **⚡ Faster development** - Modern templates and tooling for rapid prototyping
+- **🔧 Production ready** - Professional patterns used in real-world applications
+- **📚 Great DX** - Anchor-like commands with improved ergonomics
+
+## 🚀 Quick Start
+
+Get up and running in less than 2 minutes:
+
+```bash
+# Install starpin
+cargo install starpin
+
+# Create a new counter project
+starpin init my-counter --template counter
+
+# Navigate to your project
+cd my-counter
+
+# Build and test
+starpin build
+starpin test
+
+# Deploy to devnet
+starpin deploy --network devnet
+```
 
 ## Project Structure
 
@@ -252,9 +294,17 @@ Contributions are welcome! Please:
 
 MIT License - see LICENSE file for details.
 
+## Links
+
+- 🌟 [Star Frame Framework](https://github.com/staratlasmeta/star_frame) - The framework this CLI supports
+- 📦 [Crates.io Package](https://crates.io/crates/starpin)
+- 📚 [Documentation](https://docs.rs/starpin)
+- 🐛 [Issues & Bug Reports](https://github.com/zsh28/starpin_cli/issues)
+- 💬 [Discussions](https://github.com/zsh28/starpin_cli/discussions)
+
 ## Support
 
 For issues and questions:
-- Open an issue on GitHub
-- Check the Star Frame documentation
+- Open an issue on [GitHub](https://github.com/zsh28/starpin_cli/issues)
+- Check the [Star Frame framework](https://github.com/staratlasmeta/star_frame)
 - Join the Solana developer community
