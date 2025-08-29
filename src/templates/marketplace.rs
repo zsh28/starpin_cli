@@ -16,10 +16,15 @@ impl Template for MarketplaceTemplate {
     fn generate(&self, project_path: &Path, project_name: &str) -> Result<()> {
         // Use default versions for backward compatibility
         let versions = DependencyVersions {
-            star_frame: "0.1.0".to_string(),
+            star_frame: "0.23.1".to_string(),
             solana_program: "1.18".to_string(),
             spl_token: "4.0".to_string(),
             spl_associated_token_account: "2.3".to_string(),
+            bytemuck: "1.23".to_string(),
+            tokio: "1.47".to_string(),
+            mollusk_svm: "0.5".to_string(),
+            solana_account: "3.0".to_string(),
+            mollusk_svm_programs_token: "0.5".to_string(),
         };
         self.generate_with_versions(project_path, project_name, &versions)
     }
@@ -43,7 +48,7 @@ description = "A Star Frame marketplace program with order book functionality"
 [dependencies]
 star_frame = {{ version = "{}", features = ["idl", "test_helpers"] }}
 star_frame_spl = {{ version = "{}", features = ["idl"] }}
-bytemuck = {{ version = "1.18", features = ["derive"] }}
+bytemuck = {{ version = "{}", features = ["derive"] }}
 borsh = {{ version = "1.5", features = ["derive"] }}
 anyhow = "1.0"
 
@@ -62,12 +67,12 @@ idl = ["star_frame/idl", "star_frame_spl/idl"]
 program-id = "{}"
 
 [dev-dependencies]
-tokio = {{ version = "1.0", features = ["macros", "rt-multi-thread"] }}
-mollusk-svm = {{ version = "0.8" }}
-solana-account = {{ version = "2.0" }}
-mollusk-svm-programs-token = {{ version = "0.8" }}
+tokio = {{ version = "{}", features = ["macros", "rt-multi-thread"] }}
+mollusk-svm = {{ version = "{}" }}
+solana-account = {{ version = "{}" }}
+mollusk-svm-programs-token = {{ version = "{}" }}
 pretty_assertions = {{ version = "1.4" }}
-"#, project_name, versions.star_frame, versions.star_frame, program_id);
+"#, project_name, versions.star_frame, versions.star_frame, versions.bytemuck, program_id, versions.tokio, versions.mollusk_svm, versions.solana_account, versions.mollusk_svm_programs_token);
 
         fs::write(project_path.join("Cargo.toml"), cargo_toml)?;
 
@@ -126,7 +131,7 @@ pub mod test_utils {{
                 freeze_authority: star_frame_spl::pod::PodOption::none(),
             }})
             .to_vec(),
-            owner: Token::ID,
+            owner: Token::ID.into(),
             executable: false,
             rent_epoch: 0,
         }};
@@ -156,7 +161,7 @@ pub mod test_utils {{
         let acc = SolanaAccount {{
             lamports: LAMPORTS_PER_SOL,
             data: token_account_data(owner, mint, amount),
-            owner: Token::ID,
+            owner: Token::ID.into(),
             executable: false,
             rent_epoch: 0,
         }};
@@ -190,10 +195,8 @@ mod idl_test {{
         fs::write(project_path.join("src").join("lib.rs"), lib_rs)?;
 
         // Create simplified state.rs for the template (basic version)
-        let state_rs = r#"use std::{cmp::Reverse, fmt::Display};
-
-use star_frame::{
-    anyhow::{ensure, Context as _},
+        let state_rs = r#"use star_frame::{
+    anyhow::ensure,
     prelude::*,
 };
 
@@ -377,14 +380,8 @@ impl Market {
     }
 }
 
-// IDL seed structs for code generation
-#[cfg(feature = "idl")]
-#[derive(Debug, GetSeeds, Clone)]
-#[get_seeds(seed_const = b"market")]
-pub struct FindMarketSeeds {
-    pub currency: SeedPath,
-    pub market_token: SeedPath,
-}
+// Simplified IDL support - removed complex seed path definitions
+// The IDL generation will work with the basic program structure
 "#;
         fs::write(project_path.join("src").join("state.rs"), state_rs)?;
 
@@ -398,22 +395,19 @@ pub use initialize::*;
 pub use place_order::*;
 
 use star_frame::prelude::*;
-#[cfg(feature = "idl")]
-use star_frame_spl::associated_token::FindAtaSeeds;
+// Removed unused import
+// Simplified
 use star_frame_spl::{
     associated_token::state::{AssociatedTokenAccount, ValidateAta},
     token::{
-        instructions::{Transfer, TransferCpiAccounts},
         state::{MintAccount, TokenAccount, ValidateToken},
         Token,
     },
 };
 
-#[cfg(feature = "idl")]
-use crate::state::FindMarketSeeds;
+// Simplified - removed IDL seed references
 use crate::state::{
-    Market, MarketSeeds, OrderTotals, ValidateCurrency, ValidateMarketToken, ZERO_PRICE,
-    ZERO_QUANTITY,
+    Market, OrderTotals, ValidateCurrency, ValidateMarketToken,
 };
 
 /// Simplified accounts for managing market orders in template
@@ -422,10 +416,7 @@ pub struct ManageOrderAccounts {
     #[validate(funder)]
     pub funder: Mut<Signer<SystemAccount>>,
     pub user: Signer,
-    #[idl(arg = Seeds(FindMarketSeeds {
-        currency: seed_path("currency"),
-        market_token: seed_path("market_token")
-    }))]
+    // Simplified - basic account without complex IDL seeds
     #[validate(arg = (
         ValidateCurrency(self.currency.key_for()),
         ValidateMarketToken(self.market_token.key_for())
@@ -434,38 +425,42 @@ pub struct ManageOrderAccounts {
     pub currency: MintAccount,
     pub market_token: MintAccount,
     #[validate(arg = ValidateAta { mint: self.market_token.key_for(), wallet: self.market.pubkey()})]
-    #[idl(arg = Seeds(FindAtaSeeds{ mint: seed_path("market_token"), wallet: seed_path("market") }))]
+    // Simplified ATA account
     pub market_token_vault: Mut<AssociatedTokenAccount>,
     #[validate(arg = ValidateAta { mint: self.currency.key_for(), wallet: self.market.pubkey()})]
-    #[idl(arg = Seeds(FindAtaSeeds{ mint: seed_path("currency"), wallet: seed_path("market") }))]
+    // Simplified ATA account
     pub currency_vault: Mut<AssociatedTokenAccount>,
     #[validate(arg = ValidateToken { mint: Some(*self.market_token.key_for()), owner: Some(*self.user.pubkey())})]
-    #[idl(arg = Seeds(FindAtaSeeds{ mint: seed_path("market_token"), wallet: seed_path("user") }))]
+    // Simplified ATA account
     pub user_market_token_vault: Mut<TokenAccount>,
     #[validate(arg = ValidateToken { mint: Some(*self.currency.key_for()), owner: Some(*self.user.pubkey())})]
-    #[idl(arg = Seeds(FindAtaSeeds{ mint: seed_path("currency"), wallet: seed_path("user") }))]
+    // Simplified ATA account
     pub user_currency_vault: Mut<TokenAccount>,
     pub token_program: Program<Token>,
 }
 
 impl ManageOrderAccounts {
-    pub fn withdraw(&self, totals: OrderTotals, ctx: &Context) -> Result<()> {
+    pub fn withdraw(&self, totals: OrderTotals, _ctx: &Context) -> Result<()> {
         let OrderTotals {
             market_tokens,
             currency,
         } = totals;
         // Simplified withdraw logic - in a real implementation would handle all token transfers
-        println!("Withdrawing: {} market tokens, {} currency", market_tokens.val().0, currency.val().0);
+        let market_tokens_val = market_tokens.val().0;
+        let currency_val = currency.val().0;
+        println!("Withdrawing: {} market tokens, {} currency", market_tokens_val, currency_val);
         Ok(())
     }
 
-    pub fn deposit(&self, totals: OrderTotals, ctx: &Context) -> Result<()> {
+    pub fn deposit(&self, totals: OrderTotals, _ctx: &Context) -> Result<()> {
         let OrderTotals {
             market_tokens,
             currency,
         } = totals;
         // Simplified deposit logic - in a real implementation would handle all token transfers  
-        println!("Depositing: {} market tokens, {} currency", market_tokens.val().0, currency.val().0);
+        let market_tokens_val = market_tokens.val().0;
+        let currency_val = currency.val().0;
+        println!("Depositing: {} market tokens, {} currency", market_tokens_val, currency_val);
         Ok(())
     }
 }
@@ -478,8 +473,7 @@ use star_frame_spl::token::{state::MintAccount, Token};
 
 use crate::state::{CreateMarketArgs, Market, MarketSeeds};
 
-#[cfg(feature = "idl")]
-use crate::state::FindMarketSeeds;
+// Simplified - removed IDL seed references
 
 /// Initializes a marketplace for a given currency and market token
 #[derive(InstructionArgs, BorshSerialize, BorshDeserialize, Copy, Clone, Debug)]
@@ -500,12 +494,7 @@ pub struct InitializeAccounts {
         market_token: *self.market_token.key_for()
       })
     ))]
-    #[idl(
-      arg = Seeds(FindMarketSeeds {
-        currency: seed_path("currency"),
-        market_token: seed_path("market_token")
-      })
-    )]
+    // Simplified - basic account without complex IDL seeds
     pub market_account: Init<Seeded<Account<Market>>>,
     pub system_program: Program<System>,
     pub token_program: Program<Token>,
@@ -569,19 +558,21 @@ impl StarFrameInstruction for PlaceOrder {
         
         println!("Placing order: {:?}", process_order_args);
         
-        let mut withdraw_totals = OrderTotals::default();
+        let withdraw_totals = OrderTotals::default();
         let mut deposit_totals = OrderTotals::default();
 
         match process_order_args.side {
             OrderSide::Bid => {
                 // Simplified: just lock up the full cost for buy orders
                 deposit_totals.currency = process_order_args.price * process_order_args.quantity;
-                println!("Buy order: locking {} currency", deposit_totals.currency.val().0);
+                let currency_val = deposit_totals.currency.val().0;
+                println!("Buy order: locking {} currency", currency_val);
             }
             OrderSide::Ask => {
                 // Simplified: just lock up the tokens for sell orders
                 deposit_totals.market_tokens = process_order_args.quantity;
-                println!("Sell order: locking {} market tokens", deposit_totals.market_tokens.val().0);
+                let market_tokens_val = deposit_totals.market_tokens.val().0;
+                println!("Sell order: locking {} market tokens", market_tokens_val);
             }
         }
 
@@ -614,9 +605,9 @@ impl StarFrameInstruction for CancelOrders {
     type Accounts<'b, 'c> = ManageOrderAccounts;
 
     fn process(
-        accounts: &mut Self::Accounts<'_, '_>,
+        _accounts: &mut Self::Accounts<'_, '_>,
         orders_to_cancel: Self::RunArg<'_>,
-        ctx: &mut Context,
+        _ctx: &mut Context,
     ) -> Result<Self::ReturnType> {
         // Simplified order cancellation - in a real implementation this would:
         // 1. Find and remove orders from order book
@@ -627,7 +618,9 @@ impl StarFrameInstruction for CancelOrders {
         println!("Cancelling {} orders", orders_to_cancel.len());
         
         for order in orders_to_cancel {
-            println!("Cancelling order ID: {}, price: {}", order.order_id, order.price.val().0);
+            let order_id = order.order_id;
+            let price_val = order.price.val().0;
+            println!("Cancelling order ID: {}, price: {}", order_id, price_val);
         }
 
         // For the template, we don't actually process the cancellation

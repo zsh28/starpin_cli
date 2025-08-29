@@ -72,6 +72,8 @@ enum Commands {
         #[arg(long, help = "Dry run - show what would be updated without making changes", default_value = "false")]
         dry_run: bool,
     },
+    #[command(about = "Remove all artifacts from the generated directories except program keypairs")]
+    Clean,
 }
 
 #[tokio::main]
@@ -105,6 +107,9 @@ async fn main() -> Result<()> {
         }
         Commands::Update { star_frame, dry_run } => {
             commands::update::handle_update(star_frame.as_deref(), dry_run).await
+        }
+        Commands::Clean => {
+            commands::clean::handle_clean().await
         }
     }
 }

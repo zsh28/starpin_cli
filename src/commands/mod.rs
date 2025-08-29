@@ -7,3 +7,4 @@ pub mod network;
 pub mod keys;
 pub mod sync;
 pub mod update;
+pub mod clean;

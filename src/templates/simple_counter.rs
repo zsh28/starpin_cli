@@ -16,10 +16,15 @@ impl Template for SimpleCounterTemplate {
     fn generate(&self, project_path: &Path, project_name: &str) -> Result<()> {
         // Use default versions for backward compatibility
         let versions = DependencyVersions {
-            star_frame: "0.1.0".to_string(),
+            star_frame: "0.23.1".to_string(),
             solana_program: "1.18".to_string(),
             spl_token: "4.0".to_string(),
             spl_associated_token_account: "2.3".to_string(),
+            bytemuck: "1.23".to_string(),
+            tokio: "1.47".to_string(),
+            mollusk_svm: "0.5".to_string(),
+            solana_account: "3.0".to_string(),
+            mollusk_svm_programs_token: "0.5".to_string(),
         };
         self.generate_with_versions(project_path, project_name, &versions)
     }
@@ -113,7 +118,6 @@ pub struct InitializeAccounts {{
         Create(()),
         Seeds(CounterSeeds {{ authority: *self.authority.pubkey() }}),
     ))]
-    #[idl(arg = Seeds(FindCounterSeeds {{ authority: seed_path("authority") }}))]
     pub counter: Init<Seeded<Account<CounterAccount>>>,
     pub system_program: Program<System>,
 }}
@@ -160,13 +164,7 @@ impl StarFrameInstruction for Increment {{
     }}
 }}
 
-// IDL seed structs for code generation
-#[cfg(feature = "idl")]
-#[derive(Debug, GetSeeds, Clone)]
-#[get_seeds(seed_const = b"COUNTER")]
-pub struct FindCounterSeeds {{
-    pub authority: SeedPath,
-}}
+
 "#, program_id);
 
         fs::write(project_path.join("src").join("lib.rs"), lib_rs)?;
@@ -191,6 +189,16 @@ mod tests {{
     #[test]
     fn test_authority_validation() {{
         println!("Simple counter authority validation test");
+    }}
+
+    #[cfg(feature = "idl")]
+    #[test]
+    fn generate_idl() -> star_frame::Result<()> {{
+        use star_frame::prelude::*;
+        let idl = CounterProgram::program_to_idl()?;
+        let idl_json = star_frame::serde_json::to_string_pretty(&idl)?;
+        std::fs::write("idl.json", &idl_json)?;
+        Ok(())
     }}
 }}
 "#, project_name.replace('-', "_"));

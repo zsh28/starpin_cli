@@ -224,17 +224,49 @@ pub async fn get_dependency_versions(star_frame_version: Option<&str>) -> Result
             }
             Err(_) => {
                 println!("⚠️  Could not fetch latest version, using fallback");
-                "0.1.0".to_string()
+                "0.23.1".to_string()
             }
         }
     };
 
-    // You can extend this to fetch other common dependency versions
+    println!("🔍 Fetching latest dependency versions...");
+    
+    // Fetch latest versions of common dependencies
+    let bytemuck = match fetch_latest_crate_version("bytemuck").await {
+        Ok(v) => v,
+        Err(_) => "1.23".to_string(),
+    };
+    
+    let tokio = match fetch_latest_crate_version("tokio").await {
+        Ok(v) => v,
+        Err(_) => "1.47".to_string(),
+    };
+    
+    let mollusk_svm = match fetch_latest_crate_version("mollusk-svm").await {
+        Ok(v) => v,
+        Err(_) => "0.5".to_string(),
+    };
+    
+    let solana_account = match fetch_latest_crate_version("solana-account").await {
+        Ok(v) => v,
+        Err(_) => "3.0".to_string(),
+    };
+    
+    let mollusk_svm_programs_token = match fetch_latest_crate_version("mollusk-svm-programs-token").await {
+        Ok(v) => v,
+        Err(_) => "0.5".to_string(),
+    };
+
     Ok(DependencyVersions {
         star_frame: star_frame_version,
         solana_program: "1.18".to_string(), // Keep stable for compatibility
         spl_token: "4.0".to_string(),
         spl_associated_token_account: "2.3".to_string(),
+        bytemuck,
+        tokio,
+        mollusk_svm,
+        solana_account,
+        mollusk_svm_programs_token,
     })
 }
 
@@ -246,6 +278,11 @@ pub struct DependencyVersions {
     pub spl_token: String,
     #[allow(dead_code)]
     pub spl_associated_token_account: String,
+    pub bytemuck: String,
+    pub tokio: String,
+    pub mollusk_svm: String,
+    pub solana_account: String,
+    pub mollusk_svm_programs_token: String,
 }
 
 #[cfg(test)]

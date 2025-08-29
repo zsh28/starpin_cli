@@ -65,16 +65,18 @@ async fn generate_idl() -> Result<()> {
     // Create IDL directory if it doesn't exist
     std::fs::create_dir_all("target/idl")?;
     
-    // Run cargo build with IDL generation environment variables
+    // Run cargo test with IDL generation features to generate IDL via the test
     let mut cmd = Command::new("cargo");
-    cmd.args(["build", "--features", "idl"]);
-    cmd.env("STAR_FRAME_GENERATE_IDL", "true");
+    cmd.args(["test", "--features", "idl", "--", "generate_idl"]);
     cmd.env("STAR_FRAME_IDL_OUTPUT", "target/idl");
 
     let output = cmd.output()?;
 
     if output.status.success() {
-        // List generated IDL files
+        // Check for IDL files in both target/idl and current directory
+        let mut idl_found = false;
+        
+        // Check target/idl directory
         if let Ok(entries) = std::fs::read_dir("target/idl") {
             let idl_files: Vec<_> = entries
                 .filter_map(|entry| entry.ok())
@@ -87,16 +89,33 @@ async fn generate_idl() -> Result<()> {
 
             if !idl_files.is_empty() {
                 println!("✅ IDL generated successfully!");
-                println!("📄 Generated files:");
+                println!("📄 Generated files in target/idl/:");
                 for file in idl_files {
                     println!("   - target/idl/{}", file.file_name().to_string_lossy());
                 }
-            } else {
-                println!("⚠️  No IDL files generated. Check if your program exports IDL properly.");
+                idl_found = true;
             }
         }
+
+        // Check current directory for idl.json (Star Frame default)
+        if Path::new("idl.json").exists() {
+            // Move idl.json to target/idl/
+            if let Ok(_) = std::fs::copy("idl.json", "target/idl/idl.json") {
+                let _ = std::fs::remove_file("idl.json");
+                if !idl_found {
+                    println!("✅ IDL generated successfully!");
+                }
+                println!("📄 Generated files:");
+                println!("   - target/idl/idl.json");
+                idl_found = true;
+            }
+        }
+
+        if !idl_found {
+            println!("⚠️  No IDL files generated. Check if your program has a generate_idl test.");
+        }
     } else {
-        println!("⚠️  IDL generation failed:");
+        println!("⚠️  IDL generation test failed:");
         println!("{}", String::from_utf8_lossy(&output.stderr));
     }
 
