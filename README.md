@@ -7,7 +7,7 @@
   [![Downloads](https://img.shields.io/crates/d/starpin.svg)](https://crates.io/crates/starpin)
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-  A command-line interface for creating and managing [Star Frame](https://github.com/staratlasmeta/star_frame) Solana programs.
+  An unofficial command-line interface for creating and managing [Star Frame](https://github.com/staratlasmeta/star_frame) Solana programs.
 </div>
 
 ## Installation
@@ -183,7 +183,7 @@ starpin sync --from-lib
 
 ## 🤔 Why Starpin?
 
-Starpin is the **official CLI** for [Star Frame](https://github.com/staratlasmeta/star_frame), bringing the power of type-safe Solana development to your fingertips:
+Starpin is an **unofficial CLI** for [Star Frame](https://github.com/staratlasmeta/star_frame), bringing the power of type-safe Solana development to your fingertips:
 
 - **🎯 Focus on logic, not boilerplate** - Star Frame eliminates repetitive Solana program code
 - **🛡️ Type safety** - Catch errors at compile-time with Rust's type system
