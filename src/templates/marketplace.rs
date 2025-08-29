@@ -710,31 +710,31 @@ A sophisticated order book marketplace program built with the Star Frame framewo
 ### Building
 
 ```bash
-starframe build
+starpin build
 ```
 
 ### Testing
 
 ```bash
-starframe test
+starpin test
 ```
 
 ### Deploying
 
 To devnet:
 ```bash
-starframe deploy --network devnet
+starpin deploy --network devnet
 ```
 
 To mainnet:
 ```bash
-starframe deploy --network mainnet
+starpin deploy --network mainnet
 ```
 
 ### Generate IDL
 
 ```bash
-starframe idl
+starpin idl
 ```
 
 ## Program Structure
@@ -889,8 +889,8 @@ test-ledger/
 
         fs::write(project_path.join(".gitignore"), gitignore)?;
 
-        // Create StarFrame.toml
-        let starframe_toml = format!(r#"[toolchain]
+        // Create Starpin.toml
+        let starpin_toml = format!(r#"[toolchain]
 
 [features]
 resolution = true
@@ -913,16 +913,16 @@ cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
-build = "starframe build"
-test = "starframe test --features test_helpers"
-deploy = "starframe deploy"
+build = "starpin build"
+test = "starpin test --features test_helpers"
+deploy = "starpin deploy"
 "#, 
             project_name.replace('-', "_"), program_id,
             project_name.replace('-', "_"), program_id,
             project_name.replace('-', "_"), program_id
         );
 
-        fs::write(project_path.join("StarFrame.toml"), starframe_toml)?;
+        fs::write(project_path.join("Starpin.toml"), starpin_toml)?;
 
         Ok(())
     }

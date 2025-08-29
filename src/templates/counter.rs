@@ -330,31 +330,31 @@ A simple counter program built with the Star Frame framework for Solana.
 ### Building
 
 ```bash
-starframe build
+starpin build
 ```
 
 ### Testing
 
 ```bash
-starframe test
+starpin test
 ```
 
 ### Deploying
 
 To devnet:
 ```bash
-starframe deploy
+starpin deploy
 ```
 
 To mainnet:
 ```bash
-starframe deploy --mainnet
+starpin deploy --mainnet
 ```
 
 ### Generate IDL
 
 ```bash
-starframe idl
+starpin idl
 ```
 
 ## Program Structure
@@ -403,8 +403,8 @@ Thumbs.db
 
         fs::write(project_path.join(".gitignore"), gitignore)?;
 
-        // Create StarFrame.toml configuration file
-        let starframe_toml = format!(r#"[toolchain]
+        // Create Starpin.toml configuration file
+        let starpin_toml = format!(r#"[toolchain]
 
 [features]
 resolution = true
@@ -427,16 +427,16 @@ cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
-build = "starframe build"
-test = "starframe test"
-deploy = "starframe deploy"
+build = "starpin build"
+test = "starpin test"
+deploy = "starpin deploy"
 "#, 
             project_name.replace('-', "_"), program_id,
             project_name.replace('-', "_"), program_id,
             project_name.replace('-', "_"), program_id
         );
 
-        fs::write(project_path.join("StarFrame.toml"), starframe_toml)?;
+        fs::write(project_path.join("Starpin.toml"), starpin_toml)?;
 
         Ok(())
     }

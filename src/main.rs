@@ -6,7 +6,7 @@ mod templates;
 mod utils;
 
 #[derive(Parser)]
-#[command(name = "starframe")]
+#[command(name = "starpin")]
 #[command(about = "A CLI tool for creating and managing Star Frame Solana programs")]
 #[command(version = "0.1.0")]
 struct Cli {
@@ -60,7 +60,7 @@ enum Commands {
         #[arg(long, help = "Program name to update (defaults to current directory name)")]
         program: Option<String>,
     },
-    #[command(about = "Sync program IDs between StarFrame.toml and lib.rs")]
+    #[command(about = "Sync program IDs between Starpin.toml and lib.rs")]
     Sync {
         #[arg(long, help = "Use program ID from lib.rs instead of generating new one", default_value = "false")]
         from_lib: bool,

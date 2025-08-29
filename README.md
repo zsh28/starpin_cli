@@ -1,4 +1,4 @@
-# Star Frame CLI
+# Starpin CLI
 
 A command-line interface for creating and managing Star Frame Solana programs.
 
@@ -8,15 +8,15 @@ A command-line interface for creating and managing Star Frame Solana programs.
 
 ```bash
 git clone <repository-url>
-cd star_frame_cli
+cd starpin_cli
 cargo build --release
-# Add target/release/starframe to your PATH
+# Add target/release/starpin to your PATH
 ```
 
 ### Using Cargo
 
 ```bash
-cargo install starframe
+cargo install starpin
 ```
 
 ## Usage
@@ -26,19 +26,19 @@ cargo install starframe
 Create a new Star Frame project using the counter template:
 
 ```bash
-starframe init my_project
+starpin init my_project
 ```
 
 Create a project with a specific template:
 
 ```bash
-starframe init my_project --template counter
+starpin init my_project --template counter
 ```
 
 Create a project in a specific directory:
 
 ```bash
-starframe init my_project --path ./projects
+starpin init my_project --path ./projects
 ```
 
 Available templates:
@@ -51,20 +51,20 @@ Available templates:
 Build for localnet (default):
 
 ```bash
-starframe build
+starpin build
 ```
 
 Build for specific network:
 
 ```bash
-starframe build --network devnet
-starframe build --network mainnet
+starpin build --network devnet
+starpin build --network mainnet
 ```
 
 Skip automatic IDL generation:
 
 ```bash
-starframe build --skip-idl
+starpin build --skip-idl
 ```
 
 ### Test Your Program
@@ -72,19 +72,19 @@ starframe build --skip-idl
 Run all tests (localnet):
 
 ```bash
-starframe test
+starpin test
 ```
 
 Run tests against specific network:
 
 ```bash
-starframe test --network devnet
+starpin test --network devnet
 ```
 
 Run tests with a filter:
 
 ```bash
-starframe test --filter counter
+starpin test --filter counter
 ```
 
 ### Deploy Your Program
@@ -92,20 +92,20 @@ starframe test --filter counter
 Deploy to devnet (default):
 
 ```bash
-starframe deploy
+starpin deploy
 ```
 
 Deploy to specific network:
 
 ```bash
-starframe deploy --network localnet
-starframe deploy --network mainnet
+starpin deploy --network localnet
+starpin deploy --network mainnet
 ```
 
 Upgrade an existing program:
 
 ```bash
-starframe deploy --network devnet --program-id <PROGRAM_ID>
+starpin deploy --network devnet --program-id <PROGRAM_ID>
 ```
 
 ### Generate IDL
@@ -113,13 +113,13 @@ starframe deploy --network devnet --program-id <PROGRAM_ID>
 Generate IDL files for client libraries:
 
 ```bash
-starframe idl
+starpin idl
 ```
 
 Generate IDL to a specific directory:
 
 ```bash
-starframe idl --output ./my-idl
+starpin idl --output ./my-idl
 ```
 
 ### Check Network Configuration
@@ -127,7 +127,7 @@ starframe idl --output ./my-idl
 View current Solana network settings:
 
 ```bash
-starframe network
+starpin network
 ```
 
 ### Generate New Program Keys
@@ -135,27 +135,27 @@ starframe network
 Generate a new random program ID (like `anchor keys list`):
 
 ```bash
-starframe keys
+starpin keys
 ```
 
 Generate keys for a specific program:
 
 ```bash
-starframe keys --program my_program
+starpin keys --program my_program
 ```
 
 ### Sync Program IDs
 
-Synchronize program IDs between StarFrame.toml and lib.rs (like `anchor keys sync`):
+Synchronize program IDs between Starpin.toml and lib.rs (like `anchor keys sync`):
 
 ```bash
-starframe sync
+starpin sync
 ```
 
 Use program ID from lib.rs as source of truth:
 
 ```bash
-starframe sync --from-lib
+starpin sync --from-lib
 ```
 
 ## Features
@@ -167,7 +167,7 @@ starframe sync --from-lib
 - ✅ Testing utilities with network configuration
 - ✅ Network-aware deployment
 - ✅ Professional network management
-- ✅ Configuration files (StarFrame.toml)
+- ✅ Configuration files (Starpin.toml)
 - ✅ Program key management (generate/sync)
 - ✅ Automatic program ID synchronization
 
@@ -178,7 +178,7 @@ Generated projects include:
 ```
 my_project/
 ├── Cargo.toml           # Rust manifest with Star Frame dependencies
-├── StarFrame.toml       # Network and deployment configuration
+├── Starpin.toml       # Network and deployment configuration
 ├── src/
 │   ├── lib.rs          # Main program logic
 │   └── main.rs         # Binary entry point

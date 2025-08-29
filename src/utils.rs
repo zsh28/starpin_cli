@@ -81,7 +81,7 @@ pub fn update_program_id_in_lib(lib_path: &Path, new_program_id: &str) -> Result
     Ok(())
 }
 
-/// Extract program ID from StarFrame.toml
+/// Extract program ID from Starpin.toml
 pub fn extract_program_id_from_toml(toml_path: &Path, program_name: &str) -> Result<Option<String>> {
     if !toml_path.exists() {
         return Ok(None);
@@ -89,7 +89,7 @@ pub fn extract_program_id_from_toml(toml_path: &Path, program_name: &str) -> Res
 
     let content = fs::read_to_string(toml_path)?;
     
-    // Look for program ID in StarFrame.toml
+    // Look for program ID in Starpin.toml
     for line in content.lines() {
         if line.trim().starts_with(&format!("{} = ", program_name)) {
             if let Some(id_start) = line.find('"') {
@@ -106,10 +106,10 @@ pub fn extract_program_id_from_toml(toml_path: &Path, program_name: &str) -> Res
     Ok(None)
 }
 
-/// Update program ID in StarFrame.toml
+/// Update program ID in Starpin.toml
 pub fn update_program_id_in_toml(toml_path: &Path, program_name: &str, new_program_id: &str) -> Result<()> {
     if !toml_path.exists() {
-        return Err(anyhow!("StarFrame.toml not found at {}", toml_path.display()));
+        return Err(anyhow!("Starpin.toml not found at {}", toml_path.display()));
     }
 
     let content = fs::read_to_string(toml_path)?;
@@ -136,11 +136,11 @@ pub fn update_program_id_in_toml(toml_path: &Path, program_name: &str, new_progr
     }
 
     if updates_made == 0 {
-        return Err(anyhow!("Could not find program '{}' declaration in StarFrame.toml", program_name));
+        return Err(anyhow!("Could not find program '{}' declaration in Starpin.toml", program_name));
     }
 
     fs::write(toml_path, updated_content)?;
-    println!("✅ Updated {} program ID entries in StarFrame.toml", updates_made);
+    println!("✅ Updated {} program ID entries in Starpin.toml", updates_made);
     Ok(())
 }
 

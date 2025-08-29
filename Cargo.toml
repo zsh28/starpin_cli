@@ -1,5 +1,5 @@
 [package]
-name = "starframe"
+name = "starpin"
 version = "0.1.0"
 edition = "2021"
 authors = ["Zeesh - contact me on Zeeshdev28@gmail.com"]
@@ -7,7 +7,7 @@ description = "CLI tool for creating and managing Star Frame Solana programs"
 license = "MIT"
 
 [[bin]]
-name = "starframe"
+name = "starpin"
 path = "src/main.rs"
 
 [dependencies]

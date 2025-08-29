@@ -34,11 +34,11 @@ pub async fn handle_init(name: &str, template: &str, path: &str, star_frame_vers
     println!("✅ Project '{}' created successfully!", name);
     println!("\n📝 Next steps:");
     println!("   cd {}", name);
-    println!("   starframe build                    # Build for localnet");
-    println!("   starframe test                     # Run tests");
-    println!("   starframe deploy --network devnet  # Deploy to devnet");
+    println!("   starpin build                    # Build for localnet");
+    println!("   starpin test                     # Run tests");
+    println!("   starpin deploy --network devnet  # Deploy to devnet");
     println!("\n🌐 Available networks: localnet, devnet, mainnet");
-    println!("📋 Configuration file: StarFrame.toml");
+    println!("📋 Configuration file: Starpin.toml");
     
     Ok(())
 }
