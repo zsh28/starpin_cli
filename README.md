@@ -7,7 +7,7 @@ A command-line interface for creating and managing Star Frame Solana programs.
 ### From Source
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/zsh28/starpin_cli
 cd starpin_cli
 cargo build --release
 # Add target/release/starpin to your PATH
