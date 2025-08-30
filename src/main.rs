@@ -8,7 +8,7 @@ mod utils;
 #[derive(Parser)]
 #[command(name = "starpin")]
 #[command(about = "A CLI tool for creating and managing Star Frame Solana programs")]
-#[command(version = "0.1.0")]
+#[command(version)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
