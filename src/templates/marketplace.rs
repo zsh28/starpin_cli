@@ -2,7 +2,7 @@ use super::Template;
 use anyhow::Result;
 use std::path::Path;
 use std::fs;
-use crate::utils::{generate_program_id, DependencyVersions};
+use crate::utils::{generate_program_id, DependencyVersions, TemplateVariables};
 
 pub struct MarketplaceTemplate;
 
@@ -30,6 +30,12 @@ impl Template for MarketplaceTemplate {
     }
 
     fn generate_with_versions(&self, project_path: &Path, project_name: &str, versions: &DependencyVersions) -> Result<()> {
+        // For backward compatibility, generate variables here
+        let variables = crate::utils::generate_template_variables(project_name, "marketplace");
+        self.generate_with_variables(project_path, &variables, versions)
+    }
+
+    fn generate_with_variables(&self, project_path: &Path, variables: &TemplateVariables, versions: &DependencyVersions) -> Result<()> {
         fs::create_dir_all(project_path)?;
         fs::create_dir_all(project_path.join("src"))?;
         fs::create_dir_all(project_path.join("src/instructions"))?;
@@ -72,7 +78,7 @@ mollusk-svm = {{ version = "{}" }}
 solana-account = {{ version = "{}" }}
 mollusk-svm-programs-token = {{ version = "{}" }}
 pretty_assertions = {{ version = "1.4" }}
-"#, project_name, versions.star_frame, versions.star_frame, versions.bytemuck, program_id, versions.tokio, versions.mollusk_svm, versions.solana_account, versions.mollusk_svm_programs_token);
+"#, variables.project_name, versions.star_frame, versions.star_frame, versions.bytemuck, program_id, versions.tokio, versions.mollusk_svm, versions.solana_account, versions.mollusk_svm_programs_token);
 
         fs::write(project_path.join("Cargo.toml"), cargo_toml)?;
 
@@ -190,7 +196,7 @@ mod idl_test {{
         Ok(())
     }}
 }}
-"#, program_id, project_name);
+"#, program_id, variables.project_name);
 
         fs::write(project_path.join("src").join("lib.rs"), lib_rs)?;
 
@@ -669,7 +675,7 @@ mod tests {{
         println!("Market authority test");
     }}
 }}
-"#, project_name.replace('-', "_"));
+"#, variables.snake_name);
 
         fs::write(project_path.join("tests").join("marketplace.rs"), test_rs)?;
 
@@ -852,7 +858,7 @@ This marketplace implementation demonstrates:
 - Production-ready architecture
 
 Perfect for building decentralized exchanges and trading platforms on Solana!
-"#, project_name, program_id);
+"#, variables.project_name, program_id);
 
         fs::write(project_path.join("README.md"), readme)?;
 
@@ -910,9 +916,9 @@ build = "starpin build"
 test = "starpin test --features test_helpers"
 deploy = "starpin deploy"
 "#, 
-            project_name.replace('-', "_"), program_id,
-            project_name.replace('-', "_"), program_id,
-            project_name.replace('-', "_"), program_id
+            variables.snake_name, program_id,
+            variables.snake_name, program_id,
+            variables.snake_name, program_id
         );
 
         fs::write(project_path.join("Starpin.toml"), starpin_toml)?;

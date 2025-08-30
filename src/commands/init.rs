@@ -1,7 +1,7 @@
 use anyhow::{Result, anyhow};
 use std::path::Path;
 use crate::templates::Template;
-use crate::utils::{project_name_validator, get_dependency_versions};
+use crate::utils::{project_name_validator, get_dependency_versions, generate_template_variables};
 
 pub async fn handle_init(name: &str, template: &str, path: &str, star_frame_version: Option<&str>) -> Result<()> {
     if !project_name_validator(name) {
@@ -29,7 +29,10 @@ pub async fn handle_init(name: &str, template: &str, path: &str, star_frame_vers
         _ => return Err(anyhow!("Unknown template: {}. Available templates: counter, simple_counter, marketplace", template)),
     };
 
-    template_impl.generate_with_versions(&project_path, name, &versions)?;
+    // Generate template variables for dynamic replacement
+    let variables = generate_template_variables(name, template);
+
+    template_impl.generate_with_variables(&project_path, &variables, &versions)?;
 
     println!("✅ Project '{}' created successfully!", name);
     println!("\n📝 Next steps:");

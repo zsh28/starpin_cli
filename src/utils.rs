@@ -155,6 +155,74 @@ pub fn get_current_program_name() -> Result<String> {
     Ok(dir_name.replace('-', "_"))
 }
 
+/// Convert project name to PascalCase for struct names
+/// e.g., "vault-program" -> "VaultProgram", "simple_counter" -> "SimpleCounter"
+pub fn to_pascal_case(name: &str) -> String {
+    name.split(&['-', '_'][..])
+        .map(|word| {
+            let mut chars = word.chars();
+            match chars.next() {
+                None => String::new(),
+                Some(first) => first.to_uppercase().chain(chars.as_str().to_lowercase().chars()).collect(),
+            }
+        })
+        .collect()
+}
+
+/// Convert project name to snake_case for rust identifiers
+/// e.g., "vault-program" -> "vault_program", "MyProject" -> "my_project"  
+pub fn to_snake_case(name: &str) -> String {
+    name.replace('-', "_").to_lowercase()
+}
+
+/// Convert project name to kebab-case for file names
+/// e.g., "vault_program" -> "vault-program", "VaultProgram" -> "vault-program"
+pub fn to_kebab_case(name: &str) -> String {
+    let mut result = String::new();
+    for (i, ch) in name.chars().enumerate() {
+        if ch.is_uppercase() && i > 0 {
+            result.push('-');
+        }
+        result.push(ch.to_lowercase().next().unwrap_or(ch));
+    }
+    result.replace('_', "-")
+}
+
+/// Generate template variables for replacement
+pub fn generate_template_variables(project_name: &str, template_type: &str) -> TemplateVariables {
+    let snake_name = to_snake_case(project_name);
+    let pascal_name = to_pascal_case(project_name);
+    let kebab_name = to_kebab_case(project_name);
+    
+    // Generate appropriate program name based on template
+    let program_suffix = match template_type {
+        "counter" => "Program",
+        "simple_counter" | "simple-counter" => "Program", 
+        "marketplace" => "Program",
+        _ => "Program",
+    };
+    
+    let program_name = format!("{}{}", pascal_name, program_suffix);
+    
+    TemplateVariables {
+        project_name: project_name.to_string(),
+        snake_name,
+        pascal_name,
+        kebab_name,
+        program_name,
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct TemplateVariables {
+    pub project_name: String,
+    pub snake_name: String,
+    pub pascal_name: String, 
+    #[allow(dead_code)]
+    pub kebab_name: String,
+    pub program_name: String,
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CrateVersion {
     pub num: String,

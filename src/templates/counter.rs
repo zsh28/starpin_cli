@@ -2,7 +2,7 @@ use super::Template;
 use anyhow::Result;
 use std::path::Path;
 use std::fs;
-use crate::utils::{generate_program_id, DependencyVersions};
+use crate::utils::{generate_program_id, DependencyVersions, TemplateVariables};
 
 pub struct CounterTemplate;
 
@@ -30,6 +30,12 @@ impl Template for CounterTemplate {
     }
 
     fn generate_with_versions(&self, project_path: &Path, project_name: &str, versions: &DependencyVersions) -> Result<()> {
+        // For backward compatibility, generate variables here
+        let variables = crate::utils::generate_template_variables(project_name, "counter");
+        self.generate_with_variables(project_path, &variables, versions)
+    }
+
+    fn generate_with_variables(&self, project_path: &Path, variables: &TemplateVariables, versions: &DependencyVersions) -> Result<()> {
         fs::create_dir_all(project_path)?;
         fs::create_dir_all(project_path.join("src"))?;
         fs::create_dir_all(project_path.join("tests"))?;
@@ -63,7 +69,7 @@ program-id = "{}"
 
 [dev-dependencies]
 tokio = {{ version = "1.0", features = ["macros", "rt-multi-thread"] }}
-"#, project_name, versions.star_frame, program_id);
+"#, variables.project_name, versions.star_frame, program_id);
 
         fs::write(project_path.join("Cargo.toml"), cargo_toml)?;
 
@@ -77,34 +83,34 @@ tokio = {{ version = "1.0", features = ["macros", "rt-multi-thread"] }}
 
 #[derive(StarFrameProgram)]
 #[program(
-    instruction_set = CounterInstructionSet,
+    instruction_set = {}InstructionSet,
     id = "{}"
 )]
-pub struct CounterProgram;
+pub struct {};
 
 #[derive(InstructionSet)]
-pub enum CounterInstructionSet {{
-    CreateCounter(CreateCounterIx),
-    UpdateSigner(UpdateCounterSignerIx),
+pub enum {}InstructionSet {{
+    Create{}(Create{}Ix),
+    UpdateSigner(Update{}SignerIx),
     Count(CountIx),
-    CloseCounter(CloseCounterIx),
+    Close{}(Close{}Ix),
 }}
 
 #[derive(Align1, Pod, Zeroable, Default, Copy, Clone, Debug, Eq, PartialEq, ProgramAccount)]
-#[program_account(seeds = CounterAccountSeeds)]
+#[program_account(seeds = {}AccountSeeds)]
 #[repr(C, packed)]
-pub struct CounterAccount {{
+pub struct {}Account {{
     pub version: u8,
     pub owner: Pubkey,
     pub signer: Pubkey,
     pub count: u64,
     pub bump: u8,
-    pub data: CounterAccountData,
+    pub data: {}AccountData,
 }}
 
 #[derive(Align1, Pod, Zeroable, Default, Copy, Clone, Debug, Eq, PartialEq, TypeToIdl)]
 #[repr(C, packed)]
-pub struct CounterAccountData {{
+pub struct {}AccountData {{
     pub version: u8,
     pub owner: Pubkey,
     pub signer: Pubkey,
@@ -113,43 +119,43 @@ pub struct CounterAccountData {{
 }}
 
 #[derive(AccountSet, Deref, DerefMut, Debug)]
-pub struct WrappedCounter(#[single_account_set] Account<CounterAccount>);
+pub struct Wrapped{}(#[single_account_set] Account<{}Account>);
 
 #[derive(Debug, GetSeeds, Clone)]
-#[get_seeds(seed_const = b"COUNTER")]
-pub struct CounterAccountSeeds {{
+#[get_seeds(seed_const = b"{}")]
+pub struct {}AccountSeeds {{
     pub owner: Pubkey,
 }}
 
 #[derive(BorshSerialize, BorshDeserialize, Debug, InstructionArgs)]
-pub struct CreateCounterIx {{
+pub struct Create{}Ix {{
     #[ix_args(&run)]
     pub start_at: Option<u64>,
 }}
 
 #[derive(AccountSet)]
-pub struct CreateCounterAccounts {{
+pub struct Create{}Accounts {{
     #[validate(funder)]
     pub funder: Signer<Mut<SystemAccount>>,
     pub owner: SystemAccount,
     #[validate(arg = (
         CreateIfNeeded(()),
-        Seeds(CounterAccountSeeds {{ owner: *self.owner.pubkey() }}),
+        Seeds({}AccountSeeds {{ owner: *self.owner.pubkey() }}),
     ))]
-    pub counter: Init<Seeded<WrappedCounter>>,
+    pub counter: Init<Seeded<Wrapped{}>>,
     pub system_program: Program<System>,
 }}
 
-impl StarFrameInstruction for CreateCounterIx {{
+impl StarFrameInstruction for Create{}Ix {{
     type ReturnType = ();
-    type Accounts<'b, 'c> = CreateCounterAccounts;
+    type Accounts<'b, 'c> = Create{}Accounts;
 
     fn process(
         accounts: &mut Self::Accounts<'_, '_>,
         start_at: Self::RunArg<'_>,
         _ctx: &mut Context,
     ) -> Result<Self::ReturnType> {{
-        **accounts.counter.data_mut()? = CounterAccount {{
+        **accounts.counter.data_mut()? = {}Account {{
             version: 0,
             signer: *accounts.owner.pubkey(),
             owner: *accounts.owner.pubkey(),
@@ -164,17 +170,17 @@ impl StarFrameInstruction for CreateCounterIx {{
 
 #[derive(BorshSerialize, BorshDeserialize, Debug, InstructionArgs)]
 #[ix_args(&run)]
-pub struct UpdateCounterSignerIx;
+pub struct Update{}SignerIx;
 
 #[derive(AccountSet, Debug)]
 #[validate(extra_validation = self.validate())]
-pub struct UpdateCounterSignerAccounts {{
+pub struct Update{}SignerAccounts {{
     pub signer: Signer<SystemAccount>,
     pub new_signer: SystemAccount,
-    pub counter: Mut<Account<CounterAccount>>,
+    pub counter: Mut<Account<{}Account>>,
 }}
 
-impl UpdateCounterSignerAccounts {{
+impl Update{}SignerAccounts {{
     fn validate(&self) -> Result<()> {{
         if *self.signer.pubkey() != self.counter.data()?.signer {{
             bail!("Incorrect signer");
@@ -183,9 +189,9 @@ impl UpdateCounterSignerAccounts {{
     }}
 }}
 
-impl StarFrameInstruction for UpdateCounterSignerIx {{
+impl StarFrameInstruction for Update{}SignerIx {{
     type ReturnType = ();
-    type Accounts<'b, 'c> = UpdateCounterSignerAccounts;
+    type Accounts<'b, 'c> = Update{}SignerAccounts;
 
     fn process(
         accounts: &mut Self::Accounts<'_, '_>,
@@ -210,7 +216,7 @@ pub struct CountIx {{
 #[validate(extra_validation = self.validate())]
 pub struct CountAccounts {{
     pub owner: Signer<SystemAccount>,
-    pub counter: Mut<Account<CounterAccount>>,
+    pub counter: Mut<Account<{}Account>>,
 }}
 
 impl CountAccounts {{
@@ -244,19 +250,28 @@ impl StarFrameInstruction for CountIx {{
 }}
 
 #[derive(BorshSerialize, BorshDeserialize, Debug, InstructionArgs)]
-pub struct CloseCounterIx;
+pub struct Close{}Ix;
 
 #[derive(AccountSet, Debug)]
-pub struct CloseCounterAccounts {{
+pub struct Close{}Accounts {{
     #[validate(address = &self.counter.data()?.signer)]
     pub signer: Signer<SystemAccount>,
     #[validate(recipient)]
+    pub counter: Mut<Wrapped{}>,
+    #[validate(recipient)]
     pub funds_to: Mut<SystemAccount>,
-    #[cleanup(arg = CloseAccount(()))]
-    pub counter: Mut<WrappedCounter>,
 }}
-empty_star_frame_instruction!(CloseCounterIx, CloseCounterAccounts);
-"#, program_id);
+empty_star_frame_instruction!(Close{}Ix, Close{}Accounts);
+        "#, 
+            variables.pascal_name, program_id, variables.program_name,
+            variables.pascal_name, variables.pascal_name, variables.pascal_name, variables.pascal_name, variables.pascal_name, variables.pascal_name,
+            variables.pascal_name, variables.pascal_name, variables.pascal_name,
+            variables.pascal_name,
+            variables.pascal_name, variables.pascal_name, variables.pascal_name.to_uppercase(), variables.pascal_name,
+            variables.pascal_name, variables.pascal_name, variables.pascal_name, variables.pascal_name, variables.pascal_name, variables.pascal_name, variables.pascal_name,
+            variables.pascal_name, variables.pascal_name, variables.pascal_name, variables.pascal_name, variables.pascal_name, variables.pascal_name,
+            variables.pascal_name, variables.pascal_name, variables.pascal_name, variables.pascal_name, variables.pascal_name, variables.pascal_name
+        );
 
         fs::write(project_path.join("src").join("lib.rs"), lib_rs)?;
 
@@ -269,34 +284,34 @@ mod tests {{
     use super::*;
 
     #[test]
-    fn test_counter_initialization() {{
+    fn test_{}_initialization() {{
         // Test logic will be implemented here
         // This is a placeholder for Star Frame testing utilities
-        println!("Counter initialization test");
+        println!("{} initialization test");
     }}
 
     #[test]
-    fn test_counter_increment() {{
+    fn test_{}_increment() {{
         // Test logic will be implemented here
-        println!("Counter increment test");
+        println!("{} increment test");
     }}
 
     #[test]
-    fn test_counter_decrement() {{
+    fn test_{}_decrement() {{
         // Test logic will be implemented here
-        println!("Counter decrement test");
+        println!("{} decrement test");
     }}
 
     #[test]
-    fn test_counter_overflow_protection() {{
-        // Test counter overflow protection
-        println!("Counter overflow protection test");
+    fn test_{}_overflow_protection() {{
+        // Test {} overflow protection
+        println!("{} overflow protection test");
     }}
 
     #[test]
-    fn test_counter_underflow_protection() {{
-        // Test counter underflow protection
-        println!("Counter underflow protection test");
+    fn test_{}_underflow_protection() {{
+        // Test {} underflow protection
+        println!("{} underflow protection test");
     }}
 
     #[test]
@@ -309,15 +324,20 @@ mod tests {{
     #[test]
     fn generate_idl() -> star_frame::Result<()> {{
         use star_frame::prelude::*;
-        let idl = CounterProgram::program_to_idl()?;
+        let idl = {}::program_to_idl()?;
         let idl_json = star_frame::serde_json::to_string_pretty(&idl)?;
         std::fs::write("idl.json", &idl_json)?;
         Ok(())
     }}
 }}
-"#, project_name.replace('-', "_"));
+"#, variables.snake_name, variables.snake_name, variables.pascal_name, 
+    variables.snake_name, variables.pascal_name, variables.snake_name, variables.pascal_name,
+    variables.snake_name, variables.snake_name, variables.pascal_name, variables.snake_name, 
+    variables.snake_name, variables.pascal_name, variables.program_name);
 
-        fs::write(project_path.join("tests").join("counter.rs"), test_rs)?;
+        // Use dynamic file naming based on project
+        let test_file_name = format!("{}.rs", variables.snake_name);
+        fs::write(project_path.join("tests").join(test_file_name), test_rs)?;
 
         // Create README.md
         let readme = format!(r#"# {} - Star Frame Counter Program
@@ -373,10 +393,10 @@ starpin idl
 
 ## Program Structure
 
-- `CounterAccount`: Program account storing authority and count
-- `Initialize`: Initialize a new counter
-- `Increment`: Increment the counter value
-- `Decrement`: Decrement the counter value
+- `{}Account`: Program account storing authority and count
+- `Create{}`: Initialize a new counter
+- `Count`: Increment/decrement the counter value
+- `Close{}`: Close the counter and reclaim rent
 
 ## Security Features
 
@@ -390,7 +410,7 @@ starpin idl
 ```
 {}
 ```
-"#, project_name, program_id);
+"#, variables.project_name, variables.pascal_name, variables.pascal_name, variables.pascal_name, program_id);
 
         fs::write(project_path.join("README.md"), readme)?;
 
@@ -445,9 +465,9 @@ build = "starpin build"
 test = "starpin test"
 deploy = "starpin deploy"
 "#, 
-            project_name.replace('-', "_"), program_id,
-            project_name.replace('-', "_"), program_id,
-            project_name.replace('-', "_"), program_id
+            variables.snake_name, program_id,
+            variables.snake_name, program_id,
+            variables.snake_name, program_id
         );
 
         fs::write(project_path.join("Starpin.toml"), starpin_toml)?;

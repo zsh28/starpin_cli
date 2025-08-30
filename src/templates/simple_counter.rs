@@ -2,7 +2,7 @@ use super::Template;
 use anyhow::Result;
 use std::path::Path;
 use std::fs;
-use crate::utils::{generate_program_id, DependencyVersions};
+use crate::utils::{generate_program_id, DependencyVersions, TemplateVariables};
 
 pub struct SimpleCounterTemplate;
 
@@ -30,6 +30,12 @@ impl Template for SimpleCounterTemplate {
     }
 
     fn generate_with_versions(&self, project_path: &Path, project_name: &str, versions: &DependencyVersions) -> Result<()> {
+        // For backward compatibility, generate variables here
+        let variables = crate::utils::generate_template_variables(project_name, "simple_counter");
+        self.generate_with_variables(project_path, &variables, versions)
+    }
+
+    fn generate_with_variables(&self, project_path: &Path, variables: &TemplateVariables, versions: &DependencyVersions) -> Result<()> {
         fs::create_dir_all(project_path)?;
         fs::create_dir_all(project_path.join("src"))?;
         fs::create_dir_all(project_path.join("tests"))?;
@@ -63,7 +69,7 @@ program-id = "{}"
 
 [dev-dependencies]
 tokio = {{ version = "1.0", features = ["macros", "rt-multi-thread"] }}
-"#, project_name, versions.star_frame, program_id);
+"#, variables.project_name, versions.star_frame, program_id);
 
         fs::write(project_path.join("Cargo.toml"), cargo_toml)?;
 
@@ -201,7 +207,7 @@ mod tests {{
         Ok(())
     }}
 }}
-"#, project_name.replace('-', "_"));
+"#, variables.snake_name);
 
         fs::write(project_path.join("tests").join("simple_counter.rs"), test_rs)?;
 
@@ -283,7 +289,7 @@ This is a basic counter program that demonstrates:
 - Star Frame instruction patterns
 
 Perfect for learning Star Frame development!
-"#, project_name, program_id);
+"#, variables.project_name, program_id);
 
         fs::write(project_path.join("README.md"), readme)?;
 
@@ -338,9 +344,9 @@ build = "starpin build"
 test = "starpin test"
 deploy = "starpin deploy"
 "#, 
-            project_name.replace('-', "_"), program_id,
-            project_name.replace('-', "_"), program_id,
-            project_name.replace('-', "_"), program_id
+            variables.snake_name, program_id,
+            variables.snake_name, program_id,
+            variables.snake_name, program_id
         );
 
         fs::write(project_path.join("Starpin.toml"), starpin_toml)?;
